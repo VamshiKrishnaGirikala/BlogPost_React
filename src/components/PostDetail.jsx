@@ -48,8 +48,7 @@ const PostDetail = () => {
                             {post.comments && post.comments.map((comment) => (
                                 <div key={comment.id}>
                                     {users && users[comment.userId] &&
-                                        <p><strong>{users[comment.userId].name}</strong></p>}
-                                    <p>{comment.comment}</p>
+                                        <p><strong>{users[comment.userId].name}: </strong>{comment.comment}</p>}
                                 </div>
                             ))}
                         </div>
