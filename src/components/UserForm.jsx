@@ -1,7 +1,8 @@
 import { useFormik } from 'formik';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const UserForm = () => {
+    //  solve the address object issue.
 
     const validate = values => {
         const errors = {};
@@ -17,13 +18,13 @@ const UserForm = () => {
         if (!values.phone) {
             errors.phone = 'Required';
         }
-        if (!values.street) {
+        if (!values.address.street) {
             errors.street = 'Required';
         }
-        if (!values.city) {
+        if (!values.address.city) {
             errors.city = 'Required';
         }
-        if (!values.zipcode) {
+        if (!values.address.zipcode) {
             errors.zipcode = 'Required';
         }
         if (!values.password) {
@@ -41,7 +42,9 @@ const UserForm = () => {
             lastName: '',
             email: '',
             phone: '',
-            company: '',
+            company: {
+                name: ''
+            },
             address: {
                 street: '',
                 suite: '',
@@ -57,8 +60,15 @@ const UserForm = () => {
         },
     });
 
+    useEffect(() => {
+        // temporary fix
+        setTimeout(() => {
+            formik.resetForm();
+        }, 1000);
+    }, []);
+
     return (
-        <form onSubmit={formik.handleSubmit}>
+        <form onSubmit={formik.handleSubmit} autoComplete="off">
             <div className="row mb-3">
                 <label htmlFor="firstName" className="col-sm-2 col-form-label">First Name</label>
                 <div className="col-sm-10">
@@ -121,10 +131,10 @@ const UserForm = () => {
                     <input
                         className='form-control'
                         id="company"
-                        name="company"
+                        name="company.name"
                         type="text"
                         onChange={formik.handleChange}
-                        value={formik.values.company}
+                        value={formik.values.company.name}
                     />
                 </div>
             </div>
@@ -134,10 +144,10 @@ const UserForm = () => {
                     <input
                         className='form-control'
                         id="street"
-                        name="street"
+                        name="address.street"
                         type="text"
                         onChange={formik.handleChange}
-                        value={formik.values.street}
+                        value={formik.values.address.street}
                     />
                     {formik.errors.street ? <div>{formik.errors.street}</div> : null}
                 </div>
@@ -148,10 +158,10 @@ const UserForm = () => {
                     <input
                         className='form-control'
                         id="suite"
-                        name="suite"
+                        name="address.suite"
                         type="text"
                         onChange={formik.handleChange}
-                        value={formik.values.suite}
+                        value={formik.values.address.suite}
                     />
                 </div>
             </div>
@@ -161,10 +171,10 @@ const UserForm = () => {
                     <input
                         className='form-control'
                         id="city"
-                        name="city"
+                        name="address.city"
                         type="text"
                         onChange={formik.handleChange}
-                        value={formik.values.city}
+                        value={formik.values.address.city}
                     />
                     {formik.errors.city ? <div>{formik.errors.city}</div> : null}
                 </div>
@@ -175,10 +185,10 @@ const UserForm = () => {
                     <input
                         className='form-control'
                         id="zipcode"
-                        name="zipcode"
+                        name="address.zipcode"
                         type="text"
                         onChange={formik.handleChange}
-                        value={formik.values.zipcode}
+                        value={formik.values.address.zipcode}
                     />
                     {formik.errors.zipcode ? <div>{formik.errors.zipcode}</div> : null}
                 </div>

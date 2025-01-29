@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom';
 import { getUserById } from '../store/usersSlice';
 const imagePlaceholderUrl = "https://dummyimage.com/800x430/5e917f/morbi-dictum.png&text=jsonplaceholder.org";
 const UserDetail = () => {
-    // const { post, status, error } = useSelector((state) => state.posts);
     const { user } = useSelector((state) => state.users);
     const { userId } = useParams();
     const dispatch = useDispatch();

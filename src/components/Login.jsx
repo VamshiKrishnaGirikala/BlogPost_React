@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useFormik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../store/usersSlice';
+import { getUserById, login } from '../store/usersSlice';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
@@ -11,6 +11,7 @@ const Login = () => {
 
   useEffect(() => {
     if (isLoggedIn) {
+      dispatch(getUserById(1, true)).unwrap();
       navigate('/posts');
     }
   }, [isLoggedIn]);

@@ -1,17 +1,19 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { getLoginStatus, logout } from "../store/usersSlice";
 
 const Navbar = () => {
     const { isLoggedIn } = useSelector(state => state.users);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     useEffect(() => {
         dispatch(getLoginStatus());
     }, [isLoggedIn]);
 
     const onLogout = () => {
         dispatch(logout());
+        navigate('/posts');
     }
     return (
         <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -47,7 +49,7 @@ const Navbar = () => {
                                 <Link className="nav-link" aria-current="users" to="/account">Account</Link>
                             </li>
                             <li className="nav-item">
-                                <Link className="nav-link" aria-current="users" onClick={onLogout}>Logout</Link>
+                                <button className="nav-link" aria-current="users" onClick={onLogout}>Logout</button>
                             </li>
                         </>
                     ) : (

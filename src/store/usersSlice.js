@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { getLocalStorageItem, getSessionStorageItem, removeLocalStorageItem, removeSessionStorageItem, setLocalStorageItem, setSessionStorageItem } from '../utils/sessionStorageUtils';
 
 const initialState = {
     users: {},
@@ -14,8 +15,11 @@ export const getUsers = createAsyncThunk('users/getUsers', async () => {
     return response.data;
 });
 
-export const getUserById = createAsyncThunk('users/getUserById', async (userId) => {
+export const getUserById = createAsyncThunk('users/getUserById', async (userId, storeUserInfo = false) => {
     const response = await axios.get(`https://jsonplaceholder.org/users/${userId}`);
+    if (storeUserInfo) {
+        return { ...response.data, storeUserInfo: true }
+    }
     return response.data;
 });
 
@@ -26,27 +30,34 @@ export const usersSlice = createSlice({
         login: (state, action) => {
             if (action.payload.email === 'johndoe@example.com' && action.payload.password === 'jsonplaceholder.org') {
                 state.isLoggedIn = true;
-                window.localStorage.setItem('isLoggedIn', 'true');
+                setLocalStorageItem('isLoggedIn', true);
             } else {
                 state.isLoggedIn = false;
-                if (window.localStorage.getItem('isLoggedIn')) {
-                    window.localStorage.removeItem('isLoggedIn');
+                if (getLocalStorageItem('isLoggedIn')) {
+                    removeLocalStorageItem('isLoggedIn');
+                }
+                if (getSessionStorageItem('userInfo')) {
+                    removeSessionStorageItem('userInfo');
                 }
             }
         },
         getLoginStatus: (state) => {
-            if (window.localStorage.getItem('isLoggedIn') === 'true') {
+            if (getLocalStorageItem('isLoggedIn')) {
                 state.isLoggedIn = true;
             } else {
                 state.isLoggedIn = false;
-                if (window.localStorage.getItem('isLoggedIn')) {
-                    window.localStorage.removeItem('isLoggedIn');
+                if (getLocalStorageItem('isLoggedIn')) {
+                    removeLocalStorageItem('isLoggedIn');
+                }
+                if (getSessionStorageItem('userInfo')) {
+                    removeSessionStorageItem('userInfo');
                 }
             }
         },
         logout: (state) => {
             state.isLoggedIn = false;
-            window.localStorage.removeItem('isLoggedIn');
+            removeLocalStorageItem('isLoggedIn');
+            removeSessionStorageItem('userInfo');
         }
     },
     extraReducers: (builder) => {
@@ -68,6 +79,10 @@ export const usersSlice = createSlice({
             }).addCase(getUserById.fulfilled, (state, action) => {
                 state.status = 'succeeded';
                 state.user = action.payload;
+                if (action.payload.storeUserInfo) {
+                    const { login, storeUserInfo, ...userInfo } = action.payload;
+                    setSessionStorageItem('userInfo', userInfo);
+                }
             }).addCase(getUserById.rejected, (state, action) => {
                 console.log("error")
                 state.status = 'failed';
