@@ -1,14 +1,22 @@
 import { useState } from "react";
 import UserForm from "./UserForm";
 import { getSessionStorageItem } from "../utils/sessionStorageUtils";
+import { useDispatch } from "react-redux";
+import { updateUserDetails } from "../store/usersSlice";
 
 const imagePlaceholderUrl = "https://dummyimage.com/800x430/5e917f/morbi-dictum.png&text=jsonplaceholder.org";
 const userInfo = getSessionStorageItem('userInfo');
 const UserAccount = () => {
   const [isEdit, setIsEdit] = useState(false);
+  const dispatch = useDispatch();
   const onEdit = () => {
     setIsEdit(prevState => !prevState);
   }
+
+  const onUpdateUserDetails = (userPayload) => {
+    dispatch(updateUserDetails(userInfo?.id, userPayload));
+  }
+
   return (
     <div className='container'>
       <h3 className='text-center'>User Account</h3>
@@ -32,7 +40,7 @@ const UserAccount = () => {
         </div>
       </div>
       <div className="mt-3">
-        {isEdit && <UserForm />}
+        {isEdit && userInfo && <UserForm userInfo={userInfo} saveUserDetails={onUpdateUserDetails} />}
       </div>
     </div>
   )

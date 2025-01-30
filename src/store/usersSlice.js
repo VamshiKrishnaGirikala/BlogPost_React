@@ -23,6 +23,11 @@ export const getUserById = createAsyncThunk('users/getUserById', async (userId, 
     return response.data;
 });
 
+export const updateUserDetails = createAsyncThunk('users/updateUserDetails', async (userId, payload) => {
+    const response = await axios.put(`https://jsonplaceholder.org/users/${userId}`, payload);
+    return response.data;
+});
+
 export const usersSlice = createSlice({
     name: 'users',
     initialState,
@@ -84,6 +89,15 @@ export const usersSlice = createSlice({
                     setSessionStorageItem('userInfo', userInfo);
                 }
             }).addCase(getUserById.rejected, (state, action) => {
+                console.log("error")
+                state.status = 'failed';
+                state.error = action.error.message;
+            })
+            .addCase(updateUserDetails.pending, (state) => {
+                state.status = 'loading';
+            }).addCase(updateUserDetails.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+            }).addCase(updateUserDetails.rejected, (state, action) => {
                 console.log("error")
                 state.status = 'failed';
                 state.error = action.error.message;

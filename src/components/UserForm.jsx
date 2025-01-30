@@ -1,16 +1,13 @@
 import { useFormik } from 'formik';
 import React, { useEffect } from 'react';
-
-const UserForm = () => {
-    //  solve the address object issue.
-
+const UserForm = ({ userInfo, saveUserDetails, isSignUp = false }) => {
     const validate = values => {
         const errors = {};
-        if (!values.firstName) {
-            errors.firstName = 'Required';
+        if (!values.firstname) {
+            errors.firstname = 'Required';
         }
-        if (!values.lastName) {
-            errors.lastName = 'Required';
+        if (!values.lastname) {
+            errors.lastname = 'Required';
         }
         if (!values.email) {
             errors.email = 'Required';
@@ -27,19 +24,21 @@ const UserForm = () => {
         if (!values.address.zipcode) {
             errors.zipcode = 'Required';
         }
-        if (!values.password) {
-            errors.password = 'Required';
-        }
-        if (!values.confirmPassword) {
-            errors.confirmPassword = 'Required';
+        if (isSignUp) {
+            if (!values.password) {
+                errors.password = 'Required';
+            }
+            if (!values.confirmPassword) {
+                errors.confirmPassword = 'Required';
+            }
         }
         return errors;
     };
 
     const formik = useFormik({
         initialValues: {
-            firstName: '',
-            lastName: '',
+            firstname: '',
+            lastname: '',
             email: '',
             phone: '',
             company: {
@@ -56,45 +55,66 @@ const UserForm = () => {
         },
         validate,
         onSubmit: values => {
-            alert(JSON.stringify(values, null, 2));
+            saveUserDetails(values);
         },
     });
 
     useEffect(() => {
-        // temporary fix
-        setTimeout(() => {
-            formik.resetForm();
-        }, 1000);
-    }, []);
+        if (userInfo) {
+            const values = {
+                firstname: userInfo.firstname,
+                lastname: userInfo.lastname,
+                email: userInfo.email,
+                phone: userInfo.phone,
+                company: {
+                    name: userInfo.company.name
+                },
+                address: {
+                    street: userInfo.address.street,
+                    suite: userInfo.address.suite,
+                    city: userInfo.address.city,
+                    zipcode: userInfo.address.zipcode
+                },
+                password: '',
+                confirmPassword: ''
+            };
+            if (isSignUp) {
+                formik.resetForm({ values });
+            } else {
+                const { password, confirmPassword, ...userAccountValues } = values;
+                formik.resetForm({ values: userAccountValues });
+            }
+        }
+    }, [userInfo, isSignUp]);
 
     return (
         <form onSubmit={formik.handleSubmit} autoComplete="off">
             <div className="row mb-3">
-                <label htmlFor="firstName" className="col-sm-2 col-form-label">First Name</label>
+                <label htmlFor="firstname" className="col-sm-2 col-form-label">First Name</label>
                 <div className="col-sm-10">
                     <input
                         className='form-control'
-                        id="firstName"
-                        name="firstName"
+                        id="firstname"
+                        name="firstname"
                         type="text"
                         onChange={formik.handleChange}
-                        value={formik.values.firstName}
+                        value={formik.values.firstname}
                     />
-                    {formik.errors.firstName ? <div>{formik.errors.firstName}</div> : null}
+                    {formik.errors.firstname ? <div>{formik.errors.firstname}</div> : null}
                 </div>
             </div>
             <div className="row mb-3">
-                <label htmlFor="lastName" className="col-sm-2 col-form-label">Last Name</label>
+                <label htmlFor="lastname" className="col-sm-2 col-form-label">Last Name</label>
                 <div className="col-sm-10">
                     <input
                         className='form-control'
-                        id="lastName"
-                        name="lastName"
+                        id="lastname"
+                        name="lastname"
                         type="text"
                         onChange={formik.handleChange}
-                        value={formik.values.lastName}
+                        value={formik.values.lastname}
                     />
-                    {formik.errors.lastName ? <div>{formik.errors.lastName}</div> : null}
+                    {formik.errors.lastname ? <div>{formik.errors.lastname}</div> : null}
                 </div>
             </div>
             <div className="row mb-3">
@@ -193,34 +213,36 @@ const UserForm = () => {
                     {formik.errors.zipcode ? <div>{formik.errors.zipcode}</div> : null}
                 </div>
             </div>
-            <div className="row mb-3">
-                <label htmlFor="password" className="col-sm-2 col-form-label">Password</label>
-                <div className="col-sm-10">
-                    <input
-                        className='form-control'
-                        id="password"
-                        name="password"
-                        type="password"
-                        onChange={formik.handleChange}
-                        value={formik.values.password}
-                    />
-                    {formik.errors.password ? <div>{formik.errors.password}</div> : null}
+            {isSignUp && (<>
+                <div className="row mb-3">
+                    <label htmlFor="password" className="col-sm-2 col-form-label">Password</label>
+                    <div className="col-sm-10">
+                        <input
+                            className='form-control'
+                            id="password"
+                            name="password"
+                            type="password"
+                            onChange={formik.handleChange}
+                            value={formik.values.password}
+                        />
+                        {formik.errors.password ? <div>{formik.errors.password}</div> : null}
+                    </div>
                 </div>
-            </div>
-            <div className="row mb-3">
-                <label htmlFor="confirmPassword" className="col-sm-2 col-form-label">Confirm Password</label>
-                <div className="col-sm-10">
-                    <input
-                        className='form-control'
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        type="password"
-                        onChange={formik.handleChange}
-                        value={formik.values.confirmPassword}
-                    />
-                    {formik.errors.confirmPassword ? <div>{formik.errors.confirmPassword}</div> : null}
+                <div className="row mb-3">
+                    <label htmlFor="confirmPassword" className="col-sm-2 col-form-label">Confirm Password</label>
+                    <div className="col-sm-10">
+                        <input
+                            className='form-control'
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            type="password"
+                            onChange={formik.handleChange}
+                            value={formik.values.confirmPassword}
+                        />
+                        {formik.errors.confirmPassword ? <div>{formik.errors.confirmPassword}</div> : null}
+                    </div>
                 </div>
-            </div>
+            </>)}
             <div className='text-center'>
                 <button type="submit" className='btn btn-primary w-100'>Submit</button>
             </div>
