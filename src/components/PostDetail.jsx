@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { getComments, getPostById } from '../store/postsSlice';
+import { deletePost, getComments, getPostById } from '../store/postsSlice';
 import { useParams } from 'react-router-dom';
 import { getUsers } from '../store/usersSlice';
+import PostForm from './PostForm';
 
 const PostDetail = () => {
+    const [isEdit, setIsEdit] = useState(false);
     const { post, status, error } = useSelector((state) => state.posts);
     const { users } = useSelector((state) => state.users);
     const { id } = useParams();
@@ -25,6 +27,15 @@ const PostDetail = () => {
 
         fetchData();
     }, [dispatch, id]);
+
+    const handlePostFormDisplay = () => {
+        setIsEdit(false);
+    }
+
+    const handleDeletePost = () => {
+        dispatch(deletePost(post.id));
+    }
+
     if (status === 'loading') {
         return <div>Loading...</div>;
     }
@@ -33,29 +44,35 @@ const PostDetail = () => {
     }
     return (
         <div className='row justify-content-center'>
-            <div className='col-6'>
-                {status === 'succeeded' && post && <div>
-                    <img className='w-100' src={post.image} style={{ height: '200px' }} alt="..." />
-                    <div>
-                        <p><strong>Title: </strong>{post.title}</p>
-                        <p><strong>Description: </strong>{post.content}</p>
-                        <div><strong>Created On: </strong>{post.updatedAt}</div>
-                        <div><strong>Posted By: </strong>{users && users[post.userId] &&
-                            users[post.userId].name}
-                        </div>
-                        <div>
-                            <strong>Comments:</strong>
-                            {post.comments && post.comments.map((comment) => (
-                                <div key={comment.id}>
-                                    {users && users[comment.userId] &&
-                                        <p><strong>{users[comment.userId].name}: </strong>{comment.comment}</p>}
-                                </div>
-                            ))}
-                        </div>
+            {!isEdit ?
+                <div className='col-6'>
+                    <div className='justify-content-end d-flex'>
+                        <button className='btn btn-primary my-3' onClick={() => setIsEdit(true)}>Edit Post</button>
+                        <button className='btn btn-danger my-3' onClick={handleDeletePost}>Delete Post</button>
                     </div>
-                </div>}
-
-            </div>
+                    {status === 'succeeded' && post && <div>
+                        <img className='w-100' src={post.image} style={{ height: '200px' }} alt="..." />
+                        <div>
+                            <p><strong>Title: </strong>{post.title}</p>
+                            <p><strong>Description: </strong>{post.content}</p>
+                            <div><strong>Created On: </strong>{post.updatedAt}</div>
+                            <div><strong>Posted By: </strong>{users && users[post.userId] &&
+                                users[post.userId].name}
+                            </div>
+                            <div>
+                                <strong>Comments:</strong>
+                                {post.comments && post.comments.map((comment) => (
+                                    <div key={comment.id}>
+                                        {users && users[comment.userId] &&
+                                            <p><strong>{users[comment.userId].name}: </strong>{comment.comment}</p>}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>}
+                </div>
+                : <PostForm isEdit={isEdit} post={post} handlePostFormDisplay={handlePostFormDisplay} />
+            }
         </div>
     )
 }

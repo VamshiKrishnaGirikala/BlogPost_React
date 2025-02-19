@@ -11,12 +11,14 @@ const initialState = {
 };
 
 export const getUsers = createAsyncThunk('users/getUsers', async () => {
-    const response = await axios.get('https://jsonplaceholder.typicode.com/users');
+    const url = "https://localhost:7041/api/Users";
+    const response = await axios.get(url);
     return response.data;
 });
 
 export const getUserById = createAsyncThunk('users/getUserById', async (userId, storeUserInfo = false) => {
-    const response = await axios.get(`https://jsonplaceholder.org/users/${userId}`);
+    const url = `https://localhost:7041/api/Users/${userId}`;
+    const response = await axios.get(url);
     if (storeUserInfo) {
         return { ...response.data, storeUserInfo: true }
     }
@@ -24,7 +26,8 @@ export const getUserById = createAsyncThunk('users/getUserById', async (userId, 
 });
 
 export const updateUserDetails = createAsyncThunk('users/updateUserDetails', async (userId, payload) => {
-    const response = await axios.put(`https://jsonplaceholder.org/users/${userId}`, payload);
+    const url = `https://localhost:7041/api/Users/${userId}`;
+    const response = await axios.put(url, payload);
     return response.data;
 });
 

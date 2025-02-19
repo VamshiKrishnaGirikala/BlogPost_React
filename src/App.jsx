@@ -7,6 +7,7 @@ import Signup from "./components/Signup"
 import UserDetail from "./components/UserDetail"
 import UserAccount from "./components/UserAccount"
 import Login from "./components/Login"
+import PostForm from "./components/PostForm"
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
         <Route path="/users/:userId" element={<UserDetail />} />
         <Route path="/account" element={<UserAccount />} />
         <Route path="/posts/:id" element={<PostDetail />} />
+        <Route path="/posts/createPost" element={<PostForm />} />
         <Route path="/" element={<Navigate to="/posts" />} />
         <Route path="/logout" element={<Navigate to="/posts" />} />
       </Routes>
