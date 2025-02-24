@@ -53,9 +53,15 @@ const Navbar = () => {
                             </li>
                         </>
                     ) : (
-                        <li className="nav-item">
-                            <Link className="nav-link" aria-current="users" to="/login">Login</Link>
-                        </li>
+                        <>
+                            <li className="nav-item">
+                                <Link className="nav-link" aria-current="users" to="/login">Login</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link className="nav-link" aria-current="users" to="/signup">Signup</Link>
+                            </li>
+                        </>
+
                     )}
 
                 </ul>

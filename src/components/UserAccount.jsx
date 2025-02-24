@@ -31,9 +31,9 @@ const UserAccount = () => {
               <p><strong>Name: </strong>{userInfo.firstname} {userInfo.lastname}</p>
               <p><strong>Phone: </strong>{userInfo.phone}</p>
               <div><strong>Email: </strong>{userInfo.email}</div>
-              <div><strong>Company: </strong>{userInfo.company.name}
+              <div><strong>Company: </strong>{userInfo.companyName}
               </div>
-              <div><strong>Address: </strong>{userInfo.address.street} {userInfo.address.city} {userInfo.address.zipcode}
+              <div><strong>Address: </strong>{userInfo.address1} {userInfo.city} {userInfo.zipcode}
               </div>
             </div>
           </div>}

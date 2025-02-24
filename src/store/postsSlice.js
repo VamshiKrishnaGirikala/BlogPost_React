@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios';
+import axiosInstance from '../utils/axiosInstance';
 const initialState = {
     status: null,
     posts: [],
@@ -15,30 +16,30 @@ export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
 
 export const getPostById = createAsyncThunk('posts/getPostById', async (id) => {
     const url = `https://localhost:7189/api/Posts/${id}`;
-    const response = await axios.get(url);
+    const response = await axiosInstance.get(url);
     return response.data;
 });
 
 export const updatePost = createAsyncThunk('posts/updatePost', async ({ id, payload }) => {
     const url = `https://localhost:7189/api/Posts/updatePost/${id}`;
-    const response = await axios.put(url, payload);
+    const response = await axiosInstance.put(url, payload);
     return response.data;
 });
 
 export const createPost = createAsyncThunk('posts/createPost', async (payload) => {
     const url = `https://localhost:7189/api/Posts/createPost`;
-    const response = await axios.post(url, payload);
+    const response = await axiosInstance.post(url, payload);
     return response.data;
 });
 
 export const deletePost = createAsyncThunk('posts/deletePost', async (id) => {
     const url = `https://localhost:7189/api/Posts/deletePost/${id}`;
-    const response = await axios.delete(url);
+    const response = await axiosInstance.delete(url);
     return response.data;
 });
 
 export const getComments = createAsyncThunk('comments/getComments', async (postId) => {
-    const url = `https://jsonplaceholder.org/comments`;
+    const url = `https://jsonplaceholder.typicode.com/comments`;
     const response = await axios.get(url);
     return response.data.filter(comment => comment.postId === postId);
 });

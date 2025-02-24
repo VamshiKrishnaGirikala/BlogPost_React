@@ -1,6 +1,9 @@
 import { useFormik } from 'formik';
 import React, { useEffect } from 'react';
+import { createUser } from '../store/usersSlice';
+import { useDispatch } from 'react-redux';
 const UserForm = ({ userInfo, saveUserDetails, isSignUp = false }) => {
+    const dispatch = useDispatch();
     const validate = values => {
         const errors = {};
         if (!values.firstname) {
@@ -9,19 +12,22 @@ const UserForm = ({ userInfo, saveUserDetails, isSignUp = false }) => {
         if (!values.lastname) {
             errors.lastname = 'Required';
         }
+        if (!values.username) {
+            errors.username = 'Required';
+        }
         if (!values.email) {
             errors.email = 'Required';
         }
         if (!values.phone) {
             errors.phone = 'Required';
         }
-        if (!values.address.street) {
-            errors.street = 'Required';
+        if (!values.address1) {
+            errors.address1 = 'Required';
         }
-        if (!values.address.city) {
+        if (!values.city) {
             errors.city = 'Required';
         }
-        if (!values.address.zipcode) {
+        if (!values.zipcode) {
             errors.zipcode = 'Required';
         }
         if (isSignUp) {
@@ -39,42 +45,44 @@ const UserForm = ({ userInfo, saveUserDetails, isSignUp = false }) => {
         initialValues: {
             firstname: '',
             lastname: '',
+            username: '',
             email: '',
             phone: '',
-            company: {
-                name: ''
-            },
-            address: {
-                street: '',
-                suite: '',
-                city: '',
-                zipcode: ''
-            },
+            companyName: '',
+            address1: '',
+            address2: '',
+            city: '',
+            zipcode: '',
             password: '',
             confirmPassword: ''
         },
         validate,
         onSubmit: values => {
-            saveUserDetails(values);
+            if (isSignUp) {
+                handleUserSignUp(values);
+            } else {
+                saveUserDetails(values);
+            }
         },
     });
+
+    const handleUserSignUp = (userPayload) => {
+        dispatch(createUser(userPayload));
+    }
 
     useEffect(() => {
         if (userInfo) {
             const values = {
-                firstname: userInfo.firstname,
-                lastname: userInfo.lastname,
+                firstname: userInfo.firstName,
+                lastname: userInfo.lastName,
+                username: userInfo.userName,
                 email: userInfo.email,
                 phone: userInfo.phone,
-                company: {
-                    name: userInfo.company.name
-                },
-                address: {
-                    street: userInfo.address.street,
-                    suite: userInfo.address.suite,
-                    city: userInfo.address.city,
-                    zipcode: userInfo.address.zipcode
-                },
+                companyName: userInfo.companyName,
+                address1: userInfo.address1,
+                address2: userInfo.address2,
+                city: userInfo.city,
+                zipcode: userInfo.zipcode,
                 password: '',
                 confirmPassword: ''
             };
@@ -118,6 +126,20 @@ const UserForm = ({ userInfo, saveUserDetails, isSignUp = false }) => {
                 </div>
             </div>
             <div className="row mb-3">
+                <label htmlFor="username" className="col-sm-2 col-form-label">Username</label>
+                <div className="col-sm-10">
+                    <input
+                        className='form-control'
+                        id="username"
+                        name="username"
+                        type="text"
+                        onChange={formik.handleChange}
+                        value={formik.values.username}
+                    />
+                    {formik.errors.username ? <div>{formik.errors.username}</div> : null}
+                </div>
+            </div>
+            <div className="row mb-3">
                 <label htmlFor="email" className="col-sm-2 col-form-label">Email Address</label>
                 <div className="col-sm-10">
                     <input
@@ -151,10 +173,10 @@ const UserForm = ({ userInfo, saveUserDetails, isSignUp = false }) => {
                     <input
                         className='form-control'
                         id="company"
-                        name="company.name"
+                        name="companyName"
                         type="text"
                         onChange={formik.handleChange}
-                        value={formik.values.company.name}
+                        value={formik.values.companyName}
                     />
                 </div>
             </div>
@@ -164,12 +186,12 @@ const UserForm = ({ userInfo, saveUserDetails, isSignUp = false }) => {
                     <input
                         className='form-control'
                         id="street"
-                        name="address.street"
+                        name="address1"
                         type="text"
                         onChange={formik.handleChange}
-                        value={formik.values.address.street}
+                        value={formik.values.address1}
                     />
-                    {formik.errors.street ? <div>{formik.errors.street}</div> : null}
+                    {formik.errors.address1 ? <div>{formik.errors.address1}</div> : null}
                 </div>
             </div>
             <div className="row mb-3">
@@ -178,10 +200,10 @@ const UserForm = ({ userInfo, saveUserDetails, isSignUp = false }) => {
                     <input
                         className='form-control'
                         id="suite"
-                        name="address.suite"
+                        name="address2"
                         type="text"
                         onChange={formik.handleChange}
-                        value={formik.values.address.suite}
+                        value={formik.values.address2}
                     />
                 </div>
             </div>
@@ -191,10 +213,10 @@ const UserForm = ({ userInfo, saveUserDetails, isSignUp = false }) => {
                     <input
                         className='form-control'
                         id="city"
-                        name="address.city"
+                        name="city"
                         type="text"
                         onChange={formik.handleChange}
-                        value={formik.values.address.city}
+                        value={formik.values.city}
                     />
                     {formik.errors.city ? <div>{formik.errors.city}</div> : null}
                 </div>
@@ -205,10 +227,10 @@ const UserForm = ({ userInfo, saveUserDetails, isSignUp = false }) => {
                     <input
                         className='form-control'
                         id="zipcode"
-                        name="address.zipcode"
+                        name="zipcode"
                         type="text"
                         onChange={formik.handleChange}
-                        value={formik.values.address.zipcode}
+                        value={formik.values.zipcode}
                     />
                     {formik.errors.zipcode ? <div>{formik.errors.zipcode}</div> : null}
                 </div>

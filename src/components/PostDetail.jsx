@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { deletePost, getComments, getPostById } from '../store/postsSlice';
 import { useParams } from 'react-router-dom';
-import { getUsers } from '../store/usersSlice';
+import { getLoginStatus, getUsers } from '../store/usersSlice';
 import PostForm from './PostForm';
 
 const PostDetail = () => {
     const [isEdit, setIsEdit] = useState(false);
     const { post, status, error } = useSelector((state) => state.posts);
-    const { users } = useSelector((state) => state.users);
+    const { users, isLoggedIn, loggedInUserDetails } = useSelector((state) => state.users);
     const { id } = useParams();
     const dispatch = useDispatch();
     useEffect(() => {
@@ -28,6 +28,10 @@ const PostDetail = () => {
         fetchData();
     }, [dispatch, id]);
 
+    useEffect(() => {
+        dispatch(getLoginStatus());
+    }, [isLoggedIn]);
+    
     const handlePostFormDisplay = () => {
         setIsEdit(false);
     }
@@ -46,10 +50,11 @@ const PostDetail = () => {
         <div className='row justify-content-center'>
             {!isEdit ?
                 <div className='col-6'>
-                    <div className='justify-content-end d-flex'>
-                        <button className='btn btn-primary my-3' onClick={() => setIsEdit(true)}>Edit Post</button>
-                        <button className='btn btn-danger my-3' onClick={handleDeletePost}>Delete Post</button>
-                    </div>
+                    {isLoggedIn && loggedInUserDetails?.id === post?.userId && (
+                        <div className='justify-content-end d-flex'>
+                            <button className='btn btn-primary my-3 me-3' onClick={() => setIsEdit(true)}>Edit Post</button>
+                            <button className='btn btn-danger my-3' onClick={handleDeletePost}>Delete Post</button>
+                        </div>)}
                     {status === 'succeeded' && post && <div>
                         <img className='w-100' src={post.image} style={{ height: '200px' }} alt="..." />
                         <div>

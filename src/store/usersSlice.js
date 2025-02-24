@@ -1,14 +1,29 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { getLocalStorageItem, getSessionStorageItem, removeLocalStorageItem, removeSessionStorageItem, setLocalStorageItem, setSessionStorageItem } from '../utils/sessionStorageUtils';
+import { IS_LOGGED_IN, USER_DETAILS } from '../utils/constants';
+import axiosInstance from '../utils/axiosInstance';
 
 const initialState = {
     users: {},
     user: null,
     status: null,
     error: null,
-    isLoggedIn: false
+    isLoggedIn: false,
+    loggedInUserDetails: null
 };
+
+export const userLogin = createAsyncThunk('users/userLogin', async (payload) => {
+    const url = "https://localhost:7041/api/account/login";
+    const response = await axiosInstance.post(url, payload);
+    return response.data;
+});
+
+export const createUser = createAsyncThunk('users/createUser', async (payload) => {
+    const url = `https://localhost:7041/api/account/register`;
+    const response = await axiosInstance.post(url, payload);
+    return response.data;
+});
 
 export const getUsers = createAsyncThunk('users/getUsers', async () => {
     const url = "https://localhost:7041/api/Users";
@@ -35,41 +50,62 @@ export const usersSlice = createSlice({
     name: 'users',
     initialState,
     reducers: {
-        login: (state, action) => {
-            if (action.payload.email === 'johndoe@example.com' && action.payload.password === 'jsonplaceholder.org') {
+        getLoginStatus: (state) => {
+            if (getLocalStorageItem(IS_LOGGED_IN)) {
                 state.isLoggedIn = true;
-                setLocalStorageItem('isLoggedIn', true);
             } else {
                 state.isLoggedIn = false;
-                if (getLocalStorageItem('isLoggedIn')) {
-                    removeLocalStorageItem('isLoggedIn');
+                if (getLocalStorageItem(IS_LOGGED_IN)) {
+                    removeLocalStorageItem(IS_LOGGED_IN);
                 }
                 if (getSessionStorageItem('userInfo')) {
                     removeSessionStorageItem('userInfo');
                 }
             }
         },
-        getLoginStatus: (state) => {
-            if (getLocalStorageItem('isLoggedIn')) {
-                state.isLoggedIn = true;
-            } else {
-                state.isLoggedIn = false;
-                if (getLocalStorageItem('isLoggedIn')) {
-                    removeLocalStorageItem('isLoggedIn');
-                }
-                if (getSessionStorageItem('userInfo')) {
-                    removeSessionStorageItem('userInfo');
-                }
+        getLoggedInUserDetails: (state) => {
+            if (getSessionStorageItem(USER_DETAILS)) {
+                state.loggedInUserDetails = getSessionStorageItem(USER_DETAILS);
             }
         },
         logout: (state) => {
             state.isLoggedIn = false;
-            removeLocalStorageItem('isLoggedIn');
-            removeSessionStorageItem('userInfo');
+            state.loggedInUserDetails = null;
+            removeLocalStorageItem(IS_LOGGED_IN);
+            removeSessionStorageItem(USER_DETAILS);
         }
     },
     extraReducers: (builder) => {
         builder
+            .addCase(userLogin.pending, (state) => {
+                state.status = 'loading';
+            }).addCase(userLogin.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.isLoggedIn = true;
+                setLocalStorageItem(IS_LOGGED_IN, true);
+                state.loggedInUserDetails = action.payload;
+                setSessionStorageItem(USER_DETAILS, action.payload);
+            }).addCase(userLogin.rejected, (state, action) => {
+                console.log("error")
+                state.status = 'failed';
+                state.error = action.error.message;
+                state.isLoggedIn = false;
+                if (getLocalStorageItem(IS_LOGGED_IN)) {
+                    removeLocalStorageItem(IS_LOGGED_IN);
+                }
+                if (getSessionStorageItem(USER_DETAILS)) {
+                    removeSessionStorageItem(USER_DETAILS);
+                }
+            })
+            .addCase(createUser.pending, (state) => {
+                state.status = 'loading';
+            }).addCase(createUser.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+            }).addCase(createUser.rejected, (state, action) => {
+                console.log("error")
+                state.status = 'failed';
+                state.error = action.error.message;
+            })
             .addCase(getUsers.pending, (state) => {
                 state.status = 'loading';
             }).addCase(getUsers.fulfilled, (state, action) => {
@@ -87,10 +123,6 @@ export const usersSlice = createSlice({
             }).addCase(getUserById.fulfilled, (state, action) => {
                 state.status = 'succeeded';
                 state.user = action.payload;
-                if (action.payload.storeUserInfo) {
-                    const { login, storeUserInfo, ...userInfo } = action.payload;
-                    setSessionStorageItem('userInfo', userInfo);
-                }
             }).addCase(getUserById.rejected, (state, action) => {
                 console.log("error")
                 state.status = 'failed';
@@ -109,6 +141,6 @@ export const usersSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { getAllUsers, login, getLoginStatus, logout } = usersSlice.actions
+export const { getAllUsers, getLoginStatus, getLoggedInUserDetails, logout } = usersSlice.actions;
 
 export default usersSlice.reducer

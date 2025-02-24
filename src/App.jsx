@@ -1,32 +1,69 @@
-import { Navigate, Route, Routes } from "react-router-dom"
-import Navbar from "./components/Navbar"
-import Posts from "./components/Posts"
-import Users from "./components/Users"
-import PostDetail from "./components/PostDetail"
-import Signup from "./components/Signup"
-import UserDetail from "./components/UserDetail"
-import UserAccount from "./components/UserAccount"
-import Login from "./components/Login"
-import PostForm from "./components/PostForm"
+import React, { Suspense, useEffect } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import Navbar from "./components/Navbar";
+import AuthGuard from "./utils/AuthGuard";
+import { getLoggedInUserDetails, getLoginStatus } from "./store/usersSlice";
+
+const LazyPosts = React.lazy(() => import('./components/Posts'));
+const LazyUsers = React.lazy(() => import('./components/Users'));
+const LazyLogin = React.lazy(() => import('./components/Login'));
+const LazySignup = React.lazy(() => import('./components/Signup'));
+const LazyUserDetail = React.lazy(() => import('./components/UserDetail'));
+const LazyUserAccount = React.lazy(() => import('./components/UserAccount'));
+const LazyPostDetail = React.lazy(() => import('./components/PostDetail'));
+const LazyPostForm = React.lazy(() => import('./components/PostForm'));
 
 const App = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getLoginStatus());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getLoggedInUserDetails());
+  }, [])
+
+  const routes = [
+    { path: "/posts", element: <LazyPosts /> },
+    { path: "/users", element: <LazyUsers /> },
+    { path: "/login", element: <LazyLogin /> },
+    { path: "/signup", element: <LazySignup /> },
+    { path: "/users/:userId", element: <LazyUserDetail /> },
+    { path: "/posts/:id", element: <LazyPostDetail /> },
+    { path: "/", element: <Navigate to="/posts" /> },
+    { path: "/logout", element: <Navigate to="/posts" /> },
+    {
+      path: "/account",
+      element: (
+        <AuthGuard>
+          <LazyUserAccount />
+        </AuthGuard>
+      ),
+    },
+    {
+      path: "/posts/createPost",
+      element: (
+        <AuthGuard>
+          <LazyPostForm />
+        </AuthGuard>
+      ),
+    },
+  ];
+
   return (
     <>
       <Navbar />
-      <Routes>
-        <Route path="/posts" element={<Posts />} />
-        <Route path="/users" element={<Users />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/users/:userId" element={<UserDetail />} />
-        <Route path="/account" element={<UserAccount />} />
-        <Route path="/posts/:id" element={<PostDetail />} />
-        <Route path="/posts/createPost" element={<PostForm />} />
-        <Route path="/" element={<Navigate to="/posts" />} />
-        <Route path="/logout" element={<Navigate to="/posts" />} />
-      </Routes>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Routes>
+          {routes.map((route, index) => (
+            <Route key={index} path={route.path} element={route.element} />
+          ))}
+        </Routes>
+      </Suspense>
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App;

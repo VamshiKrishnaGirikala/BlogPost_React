@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useFormik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUserById, login } from '../store/usersSlice';
+import { userLogin } from '../store/usersSlice';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
@@ -11,14 +11,13 @@ const Login = () => {
 
   useEffect(() => {
     if (isLoggedIn) {
-      dispatch(getUserById(1, true)).unwrap();
       navigate('/posts');
     }
   }, [isLoggedIn]);
   const validate = values => {
     const errors = {};
-    if (!values.email) {
-      errors.email = 'Required';
+    if (!values.username) {
+      errors.username = 'Required';
     }
     if (!values.password) {
       errors.password = 'Required';
@@ -27,13 +26,13 @@ const Login = () => {
   };
   const formik = useFormik({
     initialValues: {
-      email: '',
+      username: '',
       password: ''
     },
     validate,
     onSubmit: values => {
       console.log("values", values);
-      dispatch(login(values));
+      dispatch(userLogin(values));
     },
   });
   return (
@@ -41,17 +40,17 @@ const Login = () => {
       <h3 className='text-center'>Login</h3>
       <form onSubmit={formik.handleSubmit}>
         <div className="row mb-3">
-          <label htmlFor="email" className="col-sm-2 col-form-label">Email Address</label>
+          <label htmlFor="username" className="col-sm-2 col-form-label">Username</label>
           <div className="col-sm-10">
             <input
               className='form-control'
-              id="email"
-              name="email"
-              type="email"
+              id="username"
+              name="username"
+              type="text"
               onChange={formik.handleChange}
-              value={formik.values.email}
+              value={formik.values.username}
             />
-            {formik.errors.email ? <div>{formik.errors.email}</div> : null}
+            {formik.errors.username ? <div>{formik.errors.username}</div> : null}
           </div>
         </div>
         <div className="row mb-3">
