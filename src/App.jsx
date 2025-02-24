@@ -4,6 +4,8 @@ import { useDispatch } from "react-redux";
 import Navbar from "./components/Navbar";
 import AuthGuard from "./utils/AuthGuard";
 import { getLoggedInUserDetails, getLoginStatus } from "./store/usersSlice";
+import withErrorBoundary from "./components/ErrorBoundary";
+import GlobalError from "./components/GlobalError";
 
 const LazyPosts = React.lazy(() => import('./components/Posts'));
 const LazyUsers = React.lazy(() => import('./components/Users'));
@@ -55,6 +57,7 @@ const App = () => {
   return (
     <>
       <Navbar />
+      <GlobalError />
       <Suspense fallback={<div>Loading...</div>}>
         <Routes>
           {routes.map((route, index) => (
@@ -66,4 +69,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default withErrorBoundary(App);

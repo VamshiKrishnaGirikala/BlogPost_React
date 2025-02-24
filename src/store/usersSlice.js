@@ -27,7 +27,7 @@ export const createUser = createAsyncThunk('users/createUser', async (payload) =
 
 export const getUsers = createAsyncThunk('users/getUsers', async () => {
     const url = "https://localhost:7041/api/Users";
-    const response = await axios.get(url);
+    const response = await axiosInstance.get(url);
     return response.data;
 });
 
