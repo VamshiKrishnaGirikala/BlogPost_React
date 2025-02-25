@@ -1,17 +1,17 @@
 import { configureStore } from '@reduxjs/toolkit'
 import postsSlice from './postsSlice';
 import usersSlice from './usersSlice';
-import globalErrorSlice from './globalErrorSlice';
-import errorMiddleware from '../middleware/errorMiddleware';
+import globalStateSlice from './globalStateSlice';
+import apiMiddleware from '../middleware/apiMiddleware';
 
 const store = configureStore({
     reducer: {
         posts: postsSlice,
         users: usersSlice,
-        globalError: globalErrorSlice
+        globalError: globalStateSlice
     },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(errorMiddleware),
+        getDefaultMiddleware().concat(apiMiddleware),
 });
 
 export default store;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { clearError } from '../store/globalErrorSlice';
+import { clearError } from '../store/globalStateSlice';
 
 const GlobalError = () => {
     const dispatch = useDispatch();

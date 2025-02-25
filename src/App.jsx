@@ -1,11 +1,12 @@
 import React, { Suspense, useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Navbar from "./components/Navbar";
 import AuthGuard from "./utils/AuthGuard";
 import { getLoggedInUserDetails, getLoginStatus } from "./store/usersSlice";
 import withErrorBoundary from "./components/ErrorBoundary";
 import GlobalError from "./components/GlobalError";
+import CustomSpinner from "./components/CustomSpinner";
 
 const LazyPosts = React.lazy(() => import('./components/Posts'));
 const LazyUsers = React.lazy(() => import('./components/Users'));
@@ -17,6 +18,7 @@ const LazyPostDetail = React.lazy(() => import('./components/PostDetail'));
 const LazyPostForm = React.lazy(() => import('./components/PostForm'));
 
 const App = () => {
+  const { loading } = useSelector((state) => state.globalError);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -58,6 +60,7 @@ const App = () => {
     <>
       <Navbar />
       <GlobalError />
+      {loading && <CustomSpinner />}
       <Suspense fallback={<div>Loading...</div>}>
         <Routes>
           {routes.map((route, index) => (
